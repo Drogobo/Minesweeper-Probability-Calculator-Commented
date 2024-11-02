@@ -1,13 +1,16 @@
+// Purpose of this code: Use probability to calculate odds of minesweeper stuff
+
 // Global variable initialization
 let numRows;
 let numColumns;
 let numMines;
 let unflaggedMines;
-let hundredCount;
-let mineGrid = [];
-let arrGrid = [];
+let hundredCount; // How many cells are 100% mines
+let mineGrid = []; // THIS IS THE MAIN VARIABLE FOR THE ENTIRE BOARD
+// It stores all sorts of things about the cell
+let arrGrid = []; 
 let edgeArr = [];
-let firstClick;
+let firstClick; // A boolean value to make the first click always safe
 let table = document.createElement('table');
 let minesRemaining = document.getElementById('minesRemaining');
 let body = document.getElementById('body');
@@ -18,7 +21,7 @@ let timer;
 let isWin;
 
 // Return all current variables for debugging
-function getVariables() {
+function getVariables() { // This is ONLY debugging; nothing else
     console.log("numMines: " + numMines);
     console.log("unflaggedMines: " + unflaggedMines);
     console.log("firstClick: " + firstClick);
@@ -81,6 +84,7 @@ function generateGrid() {
     firstClick = true;
 
     // Remove Old Table
+    // This also initializes the board state and related variables
     resetTimer();
     hundredCount = 0;
     mineGrid = [];
@@ -90,9 +94,10 @@ function generateGrid() {
     isWin = false;
     
     // Get New Table Data
-    numRows = parseInt(document.getElementById('numRows').value);
+    numRows = parseInt(document.getElementById('numRows').value); // This gets the number from input
     numColumns = parseInt(document.getElementById('numColumns').value);
     numMines = parseInt(document.getElementById('numMines').value);
+    // Error handle for these cases
     if (numRows < 1 || numColumns < 1 || numMines < 1) {
         alert('Rows, columns, and number of mines must be at least 1');
         return false;
@@ -105,15 +110,27 @@ function generateGrid() {
         alert('Maximum grid size is 16x30 and 99 mines');
         return false;
     }
+    // Make sure the amound of unflagged mines is set to the amount of mines
     unflaggedMines = numMines;
     document.getElementById('timerBlock').style.display = 'block';
+    // Tell the user about remaining mines
     minesRemaining.textContent = 'Mines Remaining: ' + numMines;
 
     // Initiate Grid
     for (let i = 0; i < numRows; i++) {
         mineGrid[i] = [];
         for (let j = 0; j < numColumns; j++) {
-            mineGrid[i][j] = {mine: false, open: false, neighbors: 0, flag: false, edge: false, edgeCount: 0, mineArr: 0, probability: -1};
+            // This is a dictionary for all the possible states
+            mineGrid[i][j] = {
+                mine: false,
+                open: false,
+                neighbors: 0,
+                flag: false,
+                edge: false,
+                edgeCount: 0,
+                mineArr: 0,
+                probability: -1 // -1 means unknown
+            };
         }
     }
     makeTable(mineGrid, table);
