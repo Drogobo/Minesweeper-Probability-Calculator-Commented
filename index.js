@@ -1,5 +1,12 @@
 // Purpose of this code: Use probability to calculate odds of minesweeper stuff
 
+// Quick comment about this code generally:
+// The original author made it so that the code does not loop through adjacent cells
+// Instead, it checks them indiviually with each adjacent cell getting its own dedicated block of code
+// It's bad practice because it makes the program so much longer and redundant than it needs to be
+// But my goal is not to edit the structure of the code
+// I just want to comment
+
 // Global variable initialization
 let numRows;
 let numColumns;
@@ -78,12 +85,14 @@ function toggleShowNonEdge() {
     makeTable(mineGrid, table);
 }
 
+// Now we get to the "fun" stuff
+
 // Generate grid based on player input
 function generateGrid() {
     // Assign First Click Attribute
     firstClick = true;
 
-    // Remove Old Table
+    // Remove old Table
     // This also initializes the board state and related variables
     resetTimer();
     hundredCount = 0;
@@ -111,7 +120,7 @@ function generateGrid() {
         return false;
     }
     // Make sure the amound of unflagged mines is set to the amount of mines
-    unflaggedMines = numMines;
+    unflaggedMines = numMines; // We will subtract from this later
     document.getElementById('timerBlock').style.display = 'block';
     // Tell the user about remaining mines
     minesRemaining.textContent = 'Mines Remaining: ' + numMines;
@@ -121,7 +130,7 @@ function generateGrid() {
         mineGrid[i] = [];
         for (let j = 0; j < numColumns; j++) {
             // This is a dictionary for all the possible states
-            mineGrid[i][j] = {
+            mineGrid[i][j] = { // These are all dummy values that will be set later on
                 mine: false,
                 open: false,
                 neighbors: 0,
@@ -133,7 +142,7 @@ function generateGrid() {
             };
         }
     }
-    makeTable(mineGrid, table);
+    makeTable(mineGrid, table); // Lets look at this
     body.appendChild(table);
 }
 
@@ -143,9 +152,10 @@ function generateProbability(isAllProbability) {
     for (let i = 0; i < mineGrid.length; i++) {
         for (let j = 0; j < mineGrid[i].length; j++) {
             mineGrid[i][j].mineArr = 0;
-            mineGrid[i][j].probability = -1;
+            mineGrid[i][j].probability = -1; // Again, -1 is unknown
         }
     }
+    // Finally assign this to eventually use it for maths later on
     hundredCount = 0;
     arrGrid = [];
     edgeArr = [];
@@ -155,13 +165,16 @@ function generateProbability(isAllProbability) {
     let ret1 = true;
     let ret2 = true;
     while (ret1 == true || ret2 == true) {
+        // These all use standard logic rules to solve
         ret1 = ruleOne(mineGrid);
         ret2 = ruleTwo(mineGrid);
+        // It loops until there is nothing else it can deduce
     }
-    ruleThree(mineGrid);
+    ruleThree(mineGrid); // This checks other cases
 
     // Calculate arrangements and probabilities
-    let index = findNextEdge(mineGrid, 0, 0);
+    let index = findNextEdge(mineGrid, 0, 0); // This finds the first edge it can from the board
+    // It should be noted that it has access to all of the edges
     let i = index[0];
     let j = index[1];
     while (i > -1) {
