@@ -147,7 +147,7 @@ function generateGrid() {
 }
 
 // Run all probablity calculations
-function generateProbability(isAllProbability) {
+function generateProbability(isAllProbability) { // NOTE: this is run my the player and not the game
     // Reset old probability values
     for (let i = 0; i < mineGrid.length; i++) {
         for (let j = 0; j < mineGrid[i].length; j++) {
@@ -174,11 +174,12 @@ function generateProbability(isAllProbability) {
 
     // Calculate arrangements and probabilities
     let index = findNextEdge(mineGrid, 0, 0); // This finds the first edge it can from the board
-    // It should be noted that it has access to all of the edges
-    let i = index[0];
+    // It should be noted that it has access to all of the exposed edges
+    let i = index[0]; // They are not vectors
+    // Instead, i and j are the x and y values of the array that index is set to
     let j = index[1];
-    while (i > -1) {
-        arrGrid.push({mine: null, r: i, c: j});
+    while (i > -1) { // Go for more and more edges
+        arrGrid.push({mine: null, r: i, c: j}); // Mine, row, collumn
         if (j == numColumns - 1) {
             index = findNextEdge(mineGrid, i+1, 0);
             i = index[0];
@@ -213,19 +214,19 @@ function generateProbability(isAllProbability) {
 }
 
 // Randomly place mines on grid
-function placeMine(mineGrid, numRows, numColumns, numMines, x, y) {
-    for (k = 0; k < numMines; k++) {
+function placeMine(mineGrid, numRows, numColumns, numMines, x, y) { // This is solid code ngl
+    for (k = 0; k < numMines; k++) { // For every mine specified...
         let i = Math.floor(Math.random() * numRows);
         let j = Math.floor(Math.random() * numColumns);
         if (i >= x-1 && i <= x+1 && j >= y-1 && j <= y+1) {
             k--;
         }
         else {
-            if (mineGrid[i][j].mine == true) {
-                k--;
+            if (mineGrid[i][j].mine == true) { // If something is already a mine
+                k--; // undo the generation
             }
             else {
-                mineGrid[i][j].mine = true;
+                mineGrid[i][j].mine = true; // Or just keep going and set it as a mine if it wasn't already
             }
         }
     }
@@ -233,20 +234,23 @@ function placeMine(mineGrid, numRows, numColumns, numMines, x, y) {
 
 // Place mines in specific locations for bugfixing
 function placeMineTwo(mineGrid) {
-
+// Nothing lol
 }
 
 // Calculate and display how many mines are nearby each cell
-function neighborCount(mineGrid) {
+// It should be noted that it does this on a cell level
+// This is NOT run every time the code needs to know the cell's value
+function neighborCount(mineGrid) { // This method should honestly be renamed to nearbyMineCount() or something
     for (let i = 0; i < numRows; i++) {
         for (let j = 0; j < numColumns; j++) {
-            let count = 0;
+            let count = 0; // This value increments for every mine around the cell
             // Left
-            if (j > 0) {
-                if (mineGrid[i][j-1].mine == true) {
-                    count++;
+            if (j > 0) { // Make sure the cell is on the board
+                if (mineGrid[i][j-1].mine == true) { // Check if something is a mine
+                    count++; // Increment counter
                 }
             }
+            // The rest of the code is copy and paste
             // Upper Left
             if (i > 0 && j > 0) {
                 if (mineGrid[i-1][j-1].mine == true) {
@@ -289,11 +293,11 @@ function neighborCount(mineGrid) {
                     count++;
                 }
             }
-            if (mineGrid[i][j].mine == true) {
-                mineGrid[i][j].neighbors = -1;
+            if (mineGrid[i][j].mine == true) { // This guy should honestly make it so that the code doesn't run if it's a mine
+                mineGrid[i][j].neighbors = -1; // A count of -1 means it is a mine
             }
             else {
-                mineGrid[i][j].neighbors = count;
+                mineGrid[i][j].neighbors = count; // Now the cell knows how many neighbors it has
             }
         }
     }
@@ -1248,16 +1252,16 @@ function ruleThree(mineGrid) {
 }
 
 // Find the next "edge" cell with an assigned logical probability starting from the given index
-function findNextEdge(mineGrid, x, y) {
-    for (let i = x; i < numRows; i++) {
-        for (let j = y; j < numColumns; j++) {
-            if (mineGrid[i][j].edge == true && mineGrid[i][j].probability < 0) {
-                return [i,j];
+function findNextEdge(mineGrid, x, y) { // This takes 0, 0 from everywhere I see it
+    for (let i = x; i < numRows; i++) { // loop through x
+        for (let j = y; j < numColumns; j++) { // loop through y
+            if (mineGrid[i][j].edge == true && mineGrid[i][j].probability < 0) { // It finds one that is unknown in probability and edge
+                return [i,j]; // Tell the user this place
             }
         }
-        y = 0;
+        y = 0; // idk why the programmer does this tbh
     }
-    return [-1, -1];
+    return [-1, -1]; // If there are no more edges to find
 }
 
 // Count how many theoretical mines are placed around a cell when generating arrangements
